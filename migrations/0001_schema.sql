@@ -1,3 +1,5 @@
+create extension if not exists pgcrypto;
+
 create table if not exists teachers (
   id uuid primary key,
   email text not null,

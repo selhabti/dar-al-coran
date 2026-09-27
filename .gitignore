@@ -35,3 +35,7 @@ npm-debug.log*
 
 # sauvegarde locale de l'ancienne app Vite
 /gestion-institut-main-backup/
+.neon
+
+# build info
+*.tsbuildinfo
