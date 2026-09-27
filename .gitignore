@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+.pnpm
+.yarn/install-state.gz
+
+# next.js
+.next/
+out/
+next-env.d.ts
+.open-next/
+.wrangler/
+
+# serwist (service worker généré au build)
+public/sw*
+public/swe-worker*
+
+# production
+build/
+dist/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# os / ide
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# logs
+*.log
+npm-debug.log*
+
+# sauvegarde locale de l'ancienne app Vite
+/gestion-institut-main-backup/
