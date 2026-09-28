@@ -120,6 +120,7 @@ const guardianSchema = z.object({
   studentId: z.string().uuid(),
   fullName: z.string().trim().min(1, "Nom du parent requis").max(120),
   relation: z.string().trim().max(40).nullable(),
+  phone: nullableText(30),
 });
 
 export async function addGuardianAction(input: unknown): Promise<ActionResult> {
@@ -141,6 +142,7 @@ const updateGuardianSchema = z.object({
   guardianId: z.string().uuid(),
   fullName: z.string().trim().min(1).max(120),
   relation: z.string().trim().max(40).nullable(),
+  phone: nullableText(30),
 });
 
 export async function updateGuardianAction(input: unknown): Promise<ActionResult> {

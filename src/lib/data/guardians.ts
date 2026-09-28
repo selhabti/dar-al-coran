@@ -57,22 +57,24 @@ export async function addGuardian(input: {
   studentId: string;
   fullName: string;
   relation: string | null;
+  phone: string | null;
 }) {
   const rows = await getSql()`
-    insert into guardians (student_id, full_name, relation)
-    values (${input.studentId}, ${input.fullName}, ${input.relation})
-    returning id, student_id, full_name, relation, is_primary, telegram_chat_id, telegram_username,
-      link_code, linked_at
+    insert into guardians (student_id, full_name, relation, phone)
+    values (${input.studentId}, ${input.fullName}, ${input.relation}, ${input.phone})
+    returning id, student_id, full_name, relation, phone, is_primary, telegram_chat_id,
+      telegram_username, link_code, linked_at
   `;
   return rows[0] as unknown as Guardian;
 }
 
 export async function updateGuardian(
   guardianId: string,
-  input: { fullName: string; relation: string | null },
+  input: { fullName: string; relation: string | null; phone: string | null },
 ) {
   const rows = await getSql()`
-    update guardians set full_name = ${input.fullName}, relation = ${input.relation}
+    update guardians
+    set full_name = ${input.fullName}, relation = ${input.relation}, phone = ${input.phone}
     where id = ${guardianId}
     returning id
   `;
@@ -91,8 +93,8 @@ export async function regenerateLinkCode(guardianId: string): Promise<Guardian> 
     update guardians
     set link_code = encode(gen_random_bytes(5), 'hex'), telegram_chat_id = null, telegram_username = null, linked_at = null
     where id = ${guardianId}
-    returning id, student_id, full_name, relation, is_primary, telegram_chat_id, telegram_username,
-      link_code, linked_at
+    returning id, student_id, full_name, relation, phone, is_primary, telegram_chat_id,
+      telegram_username, link_code, linked_at
   `;
   const guardian = rows[0] as unknown as Guardian | undefined;
   if (!guardian) throw new Error("Parent introuvable");
@@ -111,7 +113,7 @@ export async function unlinkGuardian(guardianId: string) {
 
 export async function findGuardianByLinkCode(code: string): Promise<Guardian | null> {
   const rows = await getSql()`
-    select id, student_id, full_name, relation, is_primary, telegram_chat_id, telegram_username,
+    select id, student_id, full_name, relation, phone, is_primary, telegram_chat_id, telegram_username,
       link_code, linked_at
     from guardians
     where lower(link_code) = lower(${code})

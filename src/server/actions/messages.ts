@@ -272,6 +272,7 @@ async function getStudentWithGuardiansForCohort(cohortId: string) {
               'student_id', g.student_id,
               'full_name', g.full_name,
               'relation', g.relation,
+              'phone', g.phone,
               'is_primary', g.is_primary,
               'telegram_chat_id', g.telegram_chat_id,
               'telegram_username', g.telegram_username,

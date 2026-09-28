@@ -45,6 +45,7 @@ export interface Guardian {
   student_id: string;
   full_name: string;
   relation: string | null;
+  phone: string | null;
   is_primary: boolean;
   telegram_chat_id: string | null;
   telegram_username: string | null;

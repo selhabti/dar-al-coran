@@ -46,9 +46,11 @@ export function GuardianManager({
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState("");
   const [newRelation, setNewRelation] = useState("");
+  const [newPhone, setNewPhone] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editRelation, setEditRelation] = useState("");
+  const [editPhone, setEditPhone] = useState("");
 
   function run(action: () => Promise<{ ok: boolean; error?: string }>, success: string) {
     startTransition(async () => {
@@ -73,11 +75,13 @@ export function GuardianManager({
           studentId,
           fullName: newName.trim(),
           relation: newRelation.trim() || null,
+          phone: newPhone.trim() || null,
         }),
       "Parent ajouté",
     );
     setNewName("");
     setNewRelation("");
+    setNewPhone("");
     setAdding(false);
   }
 
@@ -92,6 +96,7 @@ export function GuardianManager({
           guardianId,
           fullName: editName.trim(),
           relation: editRelation.trim() || null,
+          phone: editPhone.trim() || null,
         }),
       "Parent mis à jour",
     );
@@ -139,6 +144,14 @@ export function GuardianManager({
                       onChange={(event) => setEditRelation(event.target.value)}
                       aria-label="Relation"
                     />
+                    <Input
+                      value={editPhone}
+                      maxLength={30}
+                      type="tel"
+                      placeholder="Téléphone"
+                      onChange={(event) => setEditPhone(event.target.value)}
+                      aria-label="Téléphone"
+                    />
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>
                         Annuler
@@ -162,6 +175,7 @@ export function GuardianManager({
                           ) : null}
                         </p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
+                          {guardian.phone ? `${guardian.phone} · ` : ""}
                           {guardian.relation ? `${guardian.relation} · ` : ""}
                           {linked
                             ? guardian.telegram_username
@@ -197,6 +211,7 @@ export function GuardianManager({
                           setEditingId(guardian.id);
                           setEditName(guardian.full_name);
                           setEditRelation(guardian.relation ?? "");
+                          setEditPhone(guardian.phone ?? "");
                         }}
                       >
                         <Pencil />
@@ -279,6 +294,17 @@ export function GuardianManager({
               maxLength={40}
               placeholder="père, mère, tuteur…"
               onChange={(event) => setNewRelation(event.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="guardian-phone">Téléphone (facultatif)</Label>
+            <Input
+              id="guardian-phone"
+              value={newPhone}
+              maxLength={30}
+              type="tel"
+              placeholder="06 25 43 41 93"
+              onChange={(event) => setNewPhone(event.target.value)}
             />
           </div>
           <div className="flex justify-end gap-2">
