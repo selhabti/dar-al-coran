@@ -4,7 +4,7 @@ import { replyToChat, type TelegramMessageUpdate } from "@/lib/telegram/client";
 export const dynamic = "force-dynamic";
 
 function linkCodeFrom(text: string): string {
-  const withoutCommand = text.replace(/^\/start@\S+\s*/i, "").trim();
+  const withoutCommand = text.trim().replace(/^\/start(@\S+)?\s*/i, "").trim();
   return withoutCommand.split(/\s+/)[0]?.trim() ?? "";
 }
 
