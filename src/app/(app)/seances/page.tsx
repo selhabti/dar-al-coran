@@ -4,7 +4,6 @@ import { NewSessionDialog } from "@/components/new-session-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   countLinkedGuardians,
   getTodayInParis,
@@ -26,50 +25,53 @@ export const dynamic = "force-dynamic";
 function SessionRow({ session }: { session: SessionListItem }) {
   const closed = session.status === "cloturee";
   return (
-    <Card className={closed ? "" : "border-primary/40"}>
-      <Link href={`/seances/${session.id}`} className="flex items-center gap-3 px-3 py-3">
-        <div className="flex w-16 shrink-0 flex-col items-center rounded-lg bg-muted px-1 py-1.5">
-          <span className="text-sm font-semibold text-foreground">
-            {formatTimeInZone(session.starts_at)}
-          </span>
-          <span className="text-[0.65rem] text-muted-foreground">
-            {session.ends_at ? formatTimeInZone(session.ends_at) : ""}
-          </span>
-        </div>
+    <Link
+      href={`/seances/${session.id}`}
+      className={`flex items-center gap-3 rounded-2xl border bg-card p-3 shadow-sm transition-all hover:shadow active:scale-[0.99] ${
+        closed ? "border-border" : "border-primary/40"
+      }`}
+    >
+      <div
+        className={`flex w-16 shrink-0 flex-col items-center rounded-xl py-2 ${
+          closed ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground"
+        }`}
+      >
+        <span className="text-sm font-bold tabular-nums">
+          {formatTimeInZone(session.starts_at)}
+        </span>
+        <span className="text-[0.65rem] opacity-80">
+          {session.ends_at ? formatTimeInZone(session.ends_at) : ""}
+        </span>
+      </div>
 
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-2 truncate text-sm font-medium">
-            {session.cohort_name}
-            <span className="text-xs font-normal text-muted-foreground">
-              {formatFullDate(session.starts_at)}
-            </span>
-          </p>
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
-            <span>
-              {session.present_count}/{session.total_count} présents
-            </span>
-            {session.last_surah ? (
-              <>
-                <span>·</span>
-                <span className="inline-flex items-center gap-1">
-                  <BookOpen className="size-3" />
-                  {session.last_surah}
-                  {session.last_ayah ? ` ${session.last_ayah}` : ""}
-                </span>
-              </>
-            ) : null}
-          </p>
-        </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold">{session.cohort_name}</p>
+        <p className="text-xs text-muted-foreground">{formatFullDate(session.starts_at)}</p>
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+          <span>
+            {session.present_count}/{session.total_count} présents
+          </span>
+          {session.last_surah ? (
+            <>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1">
+                <BookOpen className="size-3" />
+                {session.last_surah}
+                {session.last_ayah ? ` ${session.last_ayah}` : ""}
+              </span>
+            </>
+          ) : null}
+        </p>
+      </div>
 
-        {closed ? (
-          <Badge variant="secondary" className="shrink-0">
-            Clôturée
-          </Badge>
-        ) : (
-          <Badge className="shrink-0">Pointer</Badge>
-        )}
-      </Link>
-    </Card>
+      {closed ? (
+        <Badge variant="secondary" className="shrink-0">
+          Clôturée
+        </Badge>
+      ) : (
+        <Badge className="shrink-0">Pointer</Badge>
+      )}
+    </Link>
   );
 }
 
@@ -105,27 +107,27 @@ export default async function SessionsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold">Séances</h1>
+          <h1 className="text-xl font-bold tracking-tight">Séances</h1>
           <p className="text-sm text-muted-foreground">Au {formatFullDate(todayDate)}</p>
         </div>
         <NewSessionDialog cohorts={cohorts} />
       </div>
 
-      <Card className="overflow-hidden border-primary/30">
-        <CardContent className="flex items-center gap-4 py-1">
-          <div className="flex w-20 shrink-0 flex-col items-center rounded-xl bg-primary/10 py-3 text-primary">
-            <span className="text-[0.7rem] uppercase tracking-wide">
+      <div className="rounded-2xl bg-gradient-to-br from-primary/15 via-primary/5 to-transparent p-4 ring-1 ring-primary/20">
+        <div className="flex items-center gap-4">
+          <div className="flex w-20 shrink-0 flex-col items-center rounded-2xl bg-background py-3 shadow-sm ring-1 ring-primary/15">
+            <span className="text-[0.7rem] font-medium uppercase tracking-wide text-primary">
               {formatMonth(todayDate)}
             </span>
-            <span className="text-3xl font-bold leading-none">{today.day}</span>
-            <span className="text-[0.7rem]">{today.year}</span>
+            <span className="text-3xl font-bold leading-none text-foreground">{today.day}</span>
+            <span className="text-[0.7rem] text-muted-foreground">{today.year}</span>
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold capitalize">{formatFullDate(todayDate)}</p>
+            <p className="text-base font-semibold capitalize">{formatFullDate(todayDate)}</p>
             <p className="text-xs capitalize text-muted-foreground">
               {weekdayLabel(today.weekday)}
             </p>
-            <div className="mt-1 flex flex-wrap gap-1.5">
+            <div className="mt-2 flex flex-wrap gap-1.5">
               {cohorts.map((cohort) => {
                 const schedule = scheduleLabel(cohort);
                 return schedule ? (
@@ -137,8 +139,8 @@ export default async function SessionsPage() {
               })}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <section className="flex flex-col gap-2">
         <h2 className="flex items-center gap-2 text-sm font-medium">

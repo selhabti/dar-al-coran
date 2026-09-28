@@ -26,7 +26,7 @@
   --ring: oklch(0.52 0.1 195);
   --success: oklch(0.6 0.13 150);
   --warning: oklch(0.72 0.15 70);
-  --background: oklch(1 0 0);
+  --background: oklch(0.985 0 0);
   --foreground: oklch(0.145 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -108,6 +108,14 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
 }
 
 .dark {

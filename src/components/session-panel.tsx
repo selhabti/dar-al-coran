@@ -283,7 +283,99 @@ export function SessionPanel({
 
       <SessionClock startsAt={session.starts_at} endsAt={session.ends_at} />
 
-      <Card className="overflow-hidden p-0">
+      <div className="flex flex-col gap-2 md:hidden">
+        {roster.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center text-sm text-muted-foreground">
+              Aucun élève actif dans ce groupe.
+            </CardContent>
+          </Card>
+        ) : (
+          roster.map((student) => {
+            const entry = entries.get(student.student_id);
+            if (!entry) return null;
+            const isSaving = saving.has(student.student_id);
+            const contact = [student.city, student.phone].filter(Boolean).join(" · ");
+            return (
+              <div key={student.student_id} className="rounded-2xl border bg-card p-3 shadow-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate font-semibold">
+                    {student.last_name} {student.first_name}
+                  </span>
+                  {isSaving ? (
+                    <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+                  ) : null}
+                </div>
+                {contact ? (
+                  <p className="mt-0.5 text-xs text-muted-foreground">{contact}</p>
+                ) : null}
+
+                <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-2">
+                  <select
+                    value={entry.attendance}
+                    onChange={(event) =>
+                      setAttendance(student.student_id, event.target.value as Attendance)
+                    }
+                    className={`h-10 rounded-xl border px-3 text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${ATTENDANCE_CLASS[entry.attendance]}`}
+                  >
+                    {ATTENDANCE_CHOICES.map((choice) => (
+                      <option key={choice.value} value={choice.value}>
+                        {choice.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      aria-pressed={entry.validated === true}
+                      onClick={() =>
+                        setValidated(student.student_id, entry.validated === true ? null : true)
+                      }
+                      className={`flex size-10 items-center justify-center rounded-xl border transition-colors ${
+                        entry.validated === true
+                          ? "border-success/50 bg-success/15 text-success"
+                          : "border-border text-muted-foreground"
+                      }`}
+                      title="Cours validé"
+                    >
+                      <Check className="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={entry.validated === false}
+                      onClick={() =>
+                        setValidated(student.student_id, entry.validated === false ? null : false)
+                      }
+                      className={`flex size-10 items-center justify-center rounded-xl border transition-colors ${
+                        entry.validated === false
+                          ? "border-destructive/50 bg-destructive/15 text-destructive"
+                          : "border-border text-muted-foreground"
+                      }`}
+                      title="Cours non validé"
+                    >
+                      <X className="size-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <Input
+                  defaultValue={entry.comment}
+                  maxLength={1000}
+                  placeholder="Commentaire…"
+                  className="mt-2 h-10"
+                  onBlur={(event) => {
+                    const value = event.target.value;
+                    if (value.trim() === entry.comment.trim()) return;
+                    void persist(student.student_id, { ...entry, comment: value });
+                  }}
+                />
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <Card className="hidden overflow-hidden p-0 md:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">

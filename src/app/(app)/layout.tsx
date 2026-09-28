@@ -17,7 +17,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         cohortNames={cohorts.map((cohort) => cohort.name)}
         telegramReady={telegramConfigured()}
       />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-4 pb-24">{children}</main>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-3 pt-3 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-4 sm:pt-4 sm:pb-10">
+        {children}
+      </main>
     </div>
   );
 }

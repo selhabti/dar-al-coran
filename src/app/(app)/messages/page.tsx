@@ -36,7 +36,7 @@ export default async function MessagesPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-lg font-semibold">Messages</h1>
+        <h1 className="text-xl font-bold tracking-tight">Messages</h1>
         <p className="text-sm text-muted-foreground">
           {messages.length > 0
             ? `${messages.length} message(s) récent(s)`

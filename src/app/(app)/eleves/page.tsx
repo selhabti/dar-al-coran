@@ -2,6 +2,7 @@ import Link from "next/link";
 import { UserRound } from "lucide-react";
 import { AddStudentDialog } from "@/components/add-student-dialog";
 import { EmptyState } from "@/components/empty-state";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { listCohortsForTeacher } from "@/lib/data/cohorts";
 import { listStudents } from "@/lib/data/students";
@@ -36,7 +37,7 @@ export default async function StudentsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold">Élèves</h1>
+          <h1 className="text-xl font-bold tracking-tight">Élèves</h1>
           <p className="text-sm text-muted-foreground">
             {rows.length > 0 ? `${rows.length} élève(s)` : "Aucun élève"}
           </p>
@@ -51,7 +52,38 @@ export default async function StudentsPage() {
           icon={UserRound}
         />
       ) : (
-        <Card className="overflow-hidden p-0">
+        <>
+          <div className="flex flex-col gap-2 md:hidden">
+            {rows.map(({ student, cohortName }) => (
+              <Link
+                key={student.id}
+                href={`/eleves/${student.id}`}
+                className="rounded-2xl border bg-card p-3 shadow-sm transition-all hover:shadow active:scale-[0.99]"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-semibold">
+                    {student.last_name} {student.first_name}
+                  </span>
+                  <Badge variant="secondary">{cohortName}</Badge>
+                </div>
+                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                  {student.city ? <span>{student.city}</span> : null}
+                  {student.phone ? (
+                    <a href={`tel:${student.phone}`} className="hover:text-foreground">
+                      {student.phone}
+                    </a>
+                  ) : null}
+                  {student.email ? (
+                    <a href={`mailto:${student.email}`} className="hover:text-foreground">
+                      {student.email}
+                    </a>
+                  ) : null}
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <Card className="hidden overflow-hidden p-0 md:block">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
@@ -106,7 +138,8 @@ export default async function StudentsPage() {
               </tbody>
             </table>
           </div>
-        </Card>
+          </Card>
+        </>
       )}
     </div>
   );

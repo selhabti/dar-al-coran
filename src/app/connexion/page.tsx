@@ -14,24 +14,28 @@ export default async function LoginPage() {
   const problem = authConfigProblem();
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 p-6">
+    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-8 overflow-hidden p-6">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 bg-gradient-to-b from-primary/15 via-primary/5 to-transparent" />
+
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <GraduationCap className="size-6" />
+        <span className="flex size-16 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+          <GraduationCap className="size-8" />
         </span>
-        <h1 className="text-xl font-semibold">Dar al-Coran</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight">Dar al-Coran</h1>
+        <p className="max-w-xs text-sm text-muted-foreground">
           Présences, validations et messages aux parents
         </p>
       </div>
 
-      {problem ? (
-        <p className="max-w-sm rounded-lg border border-warning/40 bg-warning/10 p-3 text-center text-sm text-warning-foreground">
-          {problem}
-        </p>
-      ) : (
-        <SignInForm />
-      )}
+      <div className="w-full max-w-sm rounded-2xl border bg-card p-5 shadow-sm">
+        {problem ? (
+          <p className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-center text-sm text-warning">
+            {problem}
+          </p>
+        ) : (
+          <SignInForm />
+        )}
+      </div>
     </main>
   );
 }
