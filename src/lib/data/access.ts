@@ -13,7 +13,8 @@ export async function listCohortIdsForTeacher(teacherId: string): Promise<string
 
 export async function requireCohortAccess(teacherId: string, cohortId: string): Promise<Cohort> {
   const rows = await getSql()`
-    select c.id, c.name, c.level, c.subject, c.slot_label, c.active
+    select c.id, c.name, c.level, c.subject, c.slot_label, c.weekday, c.start_time, c.end_time,
+      c.timezone, c.active
     from cohorts c
     join teacher_cohorts tc on tc.cohort_id = c.id
     where tc.teacher_id = ${teacherId} and c.id = ${cohortId}
@@ -28,7 +29,7 @@ export async function requireStudentAccess(teacherId: string, studentId: string)
   if (cohortIds.length === 0) notFound();
 
   const rows = await getSql()`
-    select s.id, s.cohort_id, s.first_name, s.last_name, s.birthdate, s.active
+    select s.id, s.cohort_id, s.first_name, s.last_name, s.birthdate, s.city, s.email, s.phone, s.active
     from students s
     where s.id = ${studentId} and s.cohort_id = any(${cohortIds}::uuid[])
   `;
@@ -37,16 +38,21 @@ export async function requireStudentAccess(teacherId: string, studentId: string)
   return student;
 }
 
-export async function requireSessionAccess(teacherId: string, sessionId: string): Promise<Session> {
+export async function requireSessionAccess(
+  teacherId: string,
+  sessionId: string,
+): Promise<Session & { is_upcoming: boolean }> {
   const cohortIds = await listCohortIdsForTeacher(teacherId);
   if (cohortIds.length === 0) notFound();
 
   const rows = await getSql()`
-    select s.id, s.cohort_id, s.teacher_id, s.title, s.starts_at, s.duration_minutes, s.status, s.closed_at
+    select s.id, s.cohort_id, s.teacher_id, s.title, s.starts_at, s.ends_at, s.duration_minutes,
+      s.status, s.closed_at, s.last_surah, s.last_ayah,
+      (s.starts_at > now()) as is_upcoming
     from sessions s
     where s.id = ${sessionId} and s.cohort_id = any(${cohortIds}::uuid[])
   `;
-  const session = rows[0] as unknown as Session | undefined;
+  const session = rows[0] as unknown as (Session & { is_upcoming: boolean }) | undefined;
   if (!session) notFound();
   return session;
 }

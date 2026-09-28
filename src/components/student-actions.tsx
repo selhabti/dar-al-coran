@@ -20,7 +20,15 @@ import { Label } from "@/components/ui/label";
 export function StudentActions({
   student,
 }: {
-  student: { id: string; first_name: string; last_name: string; birthdate: string | null };
+  student: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    birthdate: string | null;
+    city: string | null;
+    email: string | null;
+    phone: string | null;
+  };
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -29,6 +37,9 @@ export function StudentActions({
   const [firstName, setFirstName] = useState(student.first_name);
   const [lastName, setLastName] = useState(student.last_name);
   const [birthdate, setBirthdate] = useState(student.birthdate ?? "");
+  const [city, setCity] = useState(student.city ?? "");
+  const [email, setEmail] = useState(student.email ?? "");
+  const [phone, setPhone] = useState(student.phone ?? "");
 
   function save() {
     if (!firstName.trim() || !lastName.trim()) {
@@ -41,6 +52,9 @@ export function StudentActions({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         birthdate: birthdate ? birthdate : null,
+        city: city.trim() || null,
+        email: email.trim() || null,
+        phone: phone.trim() || null,
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -111,6 +125,37 @@ export function StudentActions({
                 type="date"
                 value={birthdate}
                 onChange={(event) => setBirthdate(event.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="edit-city">Ville de résidence</Label>
+                <Input
+                  id="edit-city"
+                  value={city}
+                  maxLength={80}
+                  onChange={(event) => setCity(event.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="edit-phone">Téléphone</Label>
+                <Input
+                  id="edit-phone"
+                  type="tel"
+                  value={phone}
+                  maxLength={30}
+                  onChange={(event) => setPhone(event.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="edit-email">E-mail</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={email}
+                maxLength={160}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </div>
           </div>

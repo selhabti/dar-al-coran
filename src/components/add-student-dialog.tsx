@@ -27,6 +27,9 @@ export function AddStudentDialog({ cohorts }: { cohorts: Cohort[] }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthdate, setBirthdate] = useState("");
+  const [city, setCity] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   function submit() {
     if (!cohortId) {
@@ -44,6 +47,9 @@ export function AddStudentDialog({ cohorts }: { cohorts: Cohort[] }) {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         birthdate: birthdate ? birthdate : null,
+        city: city.trim() || null,
+        email: email.trim() || null,
+        phone: phone.trim() || null,
       });
 
       if (!result.ok) {
@@ -56,6 +62,9 @@ export function AddStudentDialog({ cohorts }: { cohorts: Cohort[] }) {
       setFirstName("");
       setLastName("");
       setBirthdate("");
+      setCity("");
+      setEmail("");
+      setPhone("");
       router.refresh();
     });
   }
@@ -128,6 +137,44 @@ export function AddStudentDialog({ cohorts }: { cohorts: Cohort[] }) {
               type="date"
               value={birthdate}
               onChange={(event) => setBirthdate(event.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="student-city">Ville de résidence</Label>
+              <Input
+                id="student-city"
+                value={city}
+                maxLength={80}
+                autoComplete="address-level2"
+                onChange={(event) => setCity(event.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="student-phone">Téléphone</Label>
+              <Input
+                id="student-phone"
+                type="tel"
+                value={phone}
+                maxLength={30}
+                autoComplete="tel"
+                placeholder="06 12 34 56 78"
+                onChange={(event) => setPhone(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="student-email">E-mail</Label>
+            <Input
+              id="student-email"
+              type="email"
+              value={email}
+              maxLength={160}
+              autoComplete="email"
+              placeholder="adulte@exemple.fr"
+              onChange={(event) => setEmail(event.target.value)}
             />
           </div>
         </div>

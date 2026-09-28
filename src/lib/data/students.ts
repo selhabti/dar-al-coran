@@ -11,6 +11,9 @@ export interface SessionRosterRow {
   student_id: string;
   first_name: string;
   last_name: string;
+  city: string | null;
+  email: string | null;
+  phone: string | null;
   attendance: Attendance | null;
   validated: boolean | null;
   comment: string | null;
@@ -19,7 +22,7 @@ export interface SessionRosterRow {
 export async function listStudents(cohortId: string): Promise<StudentWithGuardians[]> {
   const rows = await getSql()`
     select
-      s.id, s.cohort_id, s.first_name, s.last_name, s.birthdate, s.active,
+      s.id, s.cohort_id, s.first_name, s.last_name, s.birthdate, s.city, s.email, s.phone, s.active,
       coalesce(
         (
           select json_agg(
@@ -55,7 +58,7 @@ export async function listStudents(cohortId: string): Promise<StudentWithGuardia
 export async function getStudentWithGuardians(studentId: string): Promise<StudentWithGuardians> {
   const rows = await getSql()`
     select
-      s.id, s.cohort_id, s.first_name, s.last_name, s.birthdate, s.active,
+      s.id, s.cohort_id, s.first_name, s.last_name, s.birthdate, s.city, s.email, s.phone, s.active,
       coalesce(
         (
           select json_agg(
@@ -108,7 +111,9 @@ export async function getStudentStats(studentId: string) {
     select
       count(*) filter (where e.attendance = 'present')::int as presents,
       count(*) filter (where e.attendance = 'retard')::int as retards,
-      count(*) filter (where e.attendance = 'absent')::int as absences,
+      count(*) filter (where e.attendance in ('absent_justifie', 'absent_non_justifie'))::int as absences,
+      count(*) filter (where e.attendance = 'absent_justifie')::int as absences_justifiees,
+      count(*) filter (where e.attendance = 'absent_non_justifie')::int as absences_non_justifiees,
       count(*) filter (where e.validated is true)::int as validations_ok,
       count(*) filter (where e.validated is false)::int as validations_ko,
       count(*)::int as total
@@ -120,11 +125,22 @@ export async function getStudentStats(studentId: string) {
       presents: number;
       retards: number;
       absences: number;
+      absences_justifiees: number;
+      absences_non_justifiees: number;
       validations_ok: number;
       validations_ko: number;
       total: number;
     }
-  ) ?? { presents: 0, retards: 0, absences: 0, validations_ok: 0, validations_ko: 0, total: 0 };
+  ) ?? {
+    presents: 0,
+    retards: 0,
+    absences: 0,
+    absences_justifiees: 0,
+    absences_non_justifiees: 0,
+    validations_ok: 0,
+    validations_ko: 0,
+    total: 0,
+  };
 }
 
 export async function getStudentsForSession(sessionId: string): Promise<SessionRosterRow[]> {
@@ -141,6 +157,9 @@ export async function getStudentsForSession(sessionId: string): Promise<SessionR
       st.id as student_id,
       st.first_name,
       st.last_name,
+      st.city,
+      st.email,
+      st.phone,
       e.attendance,
       e.validated,
       e.comment

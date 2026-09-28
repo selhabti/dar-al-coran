@@ -72,6 +72,24 @@ export default async function StudentDetailPage({
               </CardTitle>
               <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
                 <span>{cohort.name}</span>
+                {student.city ? (
+                  <>
+                    <span>·</span>
+                    <span>{student.city}</span>
+                  </>
+                ) : null}
+                {student.phone ? (
+                  <>
+                    <span>·</span>
+                    <span>{student.phone}</span>
+                  </>
+                ) : null}
+                {student.email ? (
+                  <>
+                    <span>·</span>
+                    <span>{student.email}</span>
+                  </>
+                ) : null}
                 {student.birthdate ? (
                   <>
                     <span>·</span>
@@ -84,7 +102,7 @@ export default async function StudentDetailPage({
           <StudentActions student={student} />
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
             <div className="rounded-lg bg-muted px-2 py-2">
               <p className="text-lg font-semibold text-success">{stats.presents}</p>
               <p className="text-[0.7rem] text-muted-foreground">Présences</p>
@@ -94,8 +112,14 @@ export default async function StudentDetailPage({
               <p className="text-[0.7rem] text-muted-foreground">Retards</p>
             </div>
             <div className="rounded-lg bg-muted px-2 py-2">
-              <p className="text-lg font-semibold text-destructive">{stats.absences}</p>
-              <p className="text-[0.7rem] text-muted-foreground">Absences</p>
+              <p className="text-lg font-semibold text-primary">{stats.absences_justifiees}</p>
+              <p className="text-[0.7rem] text-muted-foreground">Abs. justifiées</p>
+            </div>
+            <div className="rounded-lg bg-muted px-2 py-2">
+              <p className="text-lg font-semibold text-destructive">
+                {stats.absences_non_justifiees}
+              </p>
+              <p className="text-[0.7rem] text-muted-foreground">Abs. non just.</p>
             </div>
           </div>
           <p className="mt-2 text-center text-xs text-muted-foreground">
@@ -158,7 +182,12 @@ export default async function StudentDetailPage({
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <Badge
-                      variant={entry.attendance === "absent" ? "destructive" : "secondary"}
+                      variant={
+                        entry.attendance === "absent_justifie" ||
+                        entry.attendance === "absent_non_justifie"
+                          ? "destructive"
+                          : "secondary"
+                      }
                     >
                       {ATTENDANCE_LABELS[entry.attendance as Attendance] ?? entry.attendance}
                     </Badge>

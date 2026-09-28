@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { ChevronRight, UserRound, Users } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { AddStudentDialog } from "@/components/add-student-dialog";
 import { EmptyState } from "@/components/empty-state";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { listCohortsForTeacher } from "@/lib/data/cohorts";
 import { listStudents } from "@/lib/data/students";
@@ -19,7 +18,10 @@ export default async function StudentsPage() {
       students: await listStudents(cohort.id),
     })),
   );
-  const total = groups.reduce((sum, group) => sum + group.students.length, 0);
+
+  const rows = groups.flatMap((group) =>
+    group.students.map((student) => ({ student, cohortName: group.cohort.name })),
+  );
 
   if (cohorts.length === 0) {
     return (
@@ -36,73 +38,75 @@ export default async function StudentsPage() {
         <div>
           <h1 className="text-lg font-semibold">Élèves</h1>
           <p className="text-sm text-muted-foreground">
-            {total > 0 ? `${total} élève(s)` : "Aucun élève"}
+            {rows.length > 0 ? `${rows.length} élève(s)` : "Aucun élève"}
           </p>
         </div>
         <AddStudentDialog cohorts={cohorts} />
       </div>
 
-      {total === 0 ? (
+      {rows.length === 0 ? (
         <EmptyState
           title="Aucun élève"
           description="Ajoutez les élèves de vos groupes pour commencer le suivi des présences."
           icon={UserRound}
         />
       ) : (
-        groups.map((group) => (
-          <section key={group.cohort.id} className="flex flex-col gap-2">
-            <h2 className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <Users className="size-3.5" />
-              {group.cohort.name}
-              <span className="text-xs">· {group.students.length}</span>
-            </h2>
-
-            {group.students.length === 0 ? (
-              <p className="rounded-xl border border-dashed px-3 py-4 text-center text-sm text-muted-foreground">
-                Aucun élève dans ce groupe.
-              </p>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {group.students.map((student) => {
-                  const linked = student.guardians.filter(
-                    (guardian) => guardian.telegram_chat_id !== null,
-                  ).length;
-                  return (
-                    <li key={student.id}>
-                      <Card className="transition-colors hover:border-primary/40">
-                        <Link
-                          href={`/eleves/${student.id}`}
-                          className="flex items-center gap-3 px-3 py-3"
-                        >
-                          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase text-muted-foreground">
-                            {student.first_name.slice(0, 1)}
-                            {student.last_name.slice(0, 1)}
-                          </span>
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-sm font-medium">
-                              {student.first_name} {student.last_name}
-                            </span>
-                            <span className="mt-0.5 block text-xs text-muted-foreground">
-                              {student.guardians.length === 0
-                                ? "Aucun parent"
-                                : `${student.guardians.length} parent(s) · ${linked} lié(s) à Telegram`}
-                            </span>
-                          </span>
-                          {student.guardians.length === 0 ? (
-                            <Badge variant="outline" className="shrink-0 text-warning">
-                              À compléter
-                            </Badge>
-                          ) : null}
-                          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
-                        </Link>
-                      </Card>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-        ))
+        <Card className="overflow-hidden p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 font-medium">Nom</th>
+                  <th className="px-3 py-2 font-medium">Prénom</th>
+                  <th className="px-3 py-2 font-medium">Ville</th>
+                  <th className="px-3 py-2 font-medium">E-mail</th>
+                  <th className="px-3 py-2 font-medium">Téléphone</th>
+                  <th className="px-3 py-2 font-medium">Groupe</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(({ student, cohortName }) => (
+                  <tr
+                    key={student.id}
+                    className="border-t transition-colors hover:bg-muted/40"
+                  >
+                    <td className="px-3 py-2">
+                      <Link
+                        href={`/eleves/${student.id}`}
+                        className="font-medium transition-colors hover:text-primary"
+                      >
+                        {student.last_name}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2">{student.first_name}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{student.city ?? "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {student.email ? (
+                        <a href={`mailto:${student.email}`} className="hover:text-foreground">
+                          {student.email}
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {student.phone ? (
+                        <a href={`tel:${student.phone}`} className="hover:text-foreground">
+                          {student.phone}
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      <span className="text-muted-foreground">{cohortName}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
     </div>
   );

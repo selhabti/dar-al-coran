@@ -16,6 +16,10 @@ export async function listCohortsForTeacher(teacherId: string): Promise<CohortWi
       c.level,
       c.subject,
       c.slot_label,
+      c.weekday,
+      c.start_time,
+      c.end_time,
+      c.timezone,
       c.active,
       (select count(*)::int from students s where s.cohort_id = c.id and s.active) as student_count,
       (
@@ -44,4 +48,21 @@ export async function countLinkedGuardians(cohortId: string): Promise<{ linked: 
   `;
   const row = rows[0] as unknown as { linked: number; total: number } | undefined;
   return row ?? { linked: 0, total: 0 };
+}
+
+export async function getTodayInParis(): Promise<{
+  iso: string;
+  weekday: number;
+  day: number;
+  month: number;
+  year: number;
+}> {
+  const rows = await getSql()`
+    select
+      to_char(now() at time zone 'Europe/Paris', 'YYYY-MM-DD') as iso,
+      extract(dow from now() at time zone 'Europe/Paris')::int as weekday
+  `;
+  const row = rows[0] as unknown as { iso: string; weekday: number };
+  const [year, month, day] = row.iso.split("-").map(Number);
+  return { iso: row.iso, weekday: row.weekday, day, month, year };
 }

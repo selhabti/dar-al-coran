@@ -3,8 +3,8 @@ import type { Attendance } from "@/lib/types";
 export const ATTENDANCE_LABELS: Record<Attendance, string> = {
   present: "Présent",
   retard: "En retard",
-  absent: "Absent",
-  exempt: "Exempté",
+  absent_justifie: "Absent justifié",
+  absent_non_justifie: "Absent non justifié",
   inconnu: "Non renseigné",
 };
 

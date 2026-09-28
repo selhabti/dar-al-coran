@@ -8,10 +8,14 @@ export async function addStudent(input: {
   firstName: string;
   lastName: string;
   birthdate: string | null;
+  city: string | null;
+  email: string | null;
+  phone: string | null;
 }) {
   const rows = await getSql()`
-    insert into students (cohort_id, first_name, last_name, birthdate)
-    values (${input.cohortId}, ${input.firstName}, ${input.lastName}, ${input.birthdate}::date)
+    insert into students (cohort_id, first_name, last_name, birthdate, city, email, phone)
+    values (${input.cohortId}, ${input.firstName}, ${input.lastName}, ${input.birthdate}::date,
+      ${input.city}, ${input.email}, ${input.phone})
     returning id
   `;
   return rows[0] as unknown as { id: string };
@@ -19,11 +23,23 @@ export async function addStudent(input: {
 
 export async function updateStudent(
   studentId: string,
-  input: { firstName: string; lastName: string; birthdate: string | null },
+  input: {
+    firstName: string;
+    lastName: string;
+    birthdate: string | null;
+    city: string | null;
+    email: string | null;
+    phone: string | null;
+  },
 ) {
   const rows = await getSql()`
     update students
-    set first_name = ${input.firstName}, last_name = ${input.lastName}, birthdate = ${input.birthdate}::date
+    set first_name = ${input.firstName},
+        last_name = ${input.lastName},
+        birthdate = ${input.birthdate}::date,
+        city = ${input.city},
+        email = ${input.email},
+        phone = ${input.phone}
     where id = ${studentId}
     returning id
   `;

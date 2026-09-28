@@ -19,9 +19,9 @@ export default async function LoginPage() {
         <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <GraduationCap className="size-6" />
         </span>
-        <h1 className="text-xl font-semibold">Institut</h1>
+        <h1 className="text-xl font-semibold">Dar al-Coran</h1>
         <p className="text-sm text-muted-foreground">
-          Presences, validations et messages aux parents
+          Présences, validations et messages aux parents
         </p>
       </div>
 

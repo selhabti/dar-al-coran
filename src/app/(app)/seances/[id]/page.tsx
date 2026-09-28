@@ -41,6 +41,7 @@ export default async function SessionDetailPage({
         roster={roster}
         templates={templates}
         telegramReady={telegramConfigured()}
+        isUpcoming={session.is_upcoming}
       />
     </div>
   );

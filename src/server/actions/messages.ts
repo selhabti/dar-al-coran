@@ -102,10 +102,15 @@ export async function sendGroupMessagesAction(input: unknown): Promise<SendResul
     const student = students.get(row.student_id);
     if (!student) continue;
     if (wanted && !wanted.has(row.student_id)) continue;
-    if (parsed.data.filter === "pointes" && !["present", "retard", "exempt"].includes(row.attendance)) {
+    if (parsed.data.filter === "pointes" && !["present", "retard"].includes(row.attendance)) {
       continue;
     }
-    if (parsed.data.filter === "absents" && row.attendance !== "absent") continue;
+    if (
+      parsed.data.filter === "absents" &&
+      !["absent_justifie", "absent_non_justifie"].includes(row.attendance)
+    ) {
+      continue;
+    }
 
     for (const guardian of student.guardians) {
       const variables = buildVariables({

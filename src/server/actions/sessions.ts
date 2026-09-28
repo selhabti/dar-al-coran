@@ -3,11 +3,23 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireCohortAccess } from "@/lib/data/access";
-import { closeSession, createSession, reopenSession, saveEntry } from "@/lib/data/sessions";
+import {
+  closeSession,
+  createSession,
+  reopenSession,
+  saveEntry,
+  updateSessionVerse,
+} from "@/lib/data/sessions";
 import { requireTeacher } from "@/lib/session";
 import { requireSessionAccess } from "@/lib/data/access";
 
-const attendanceValues = ["present", "retard", "absent", "exempt", "inconnu"] as const;
+const attendanceValues = [
+  "present",
+  "retard",
+  "absent_justifie",
+  "absent_non_justifie",
+  "inconnu",
+] as const;
 
 const entrySchema = z.object({
   sessionId: z.string().uuid(),
@@ -41,6 +53,7 @@ const createSessionSchema = z.object({
   cohortId: z.string().uuid(),
   title: z.string().max(120).optional(),
   startsAt: z.string().min(1),
+  endsAt: z.string().min(1).nullable().optional(),
   durationMinutes: z.number().int().positive().max(600).nullable(),
 });
 
@@ -56,11 +69,39 @@ export async function createSessionAction(input: unknown): Promise<{ ok: boolean
     teacherId: teacher.id,
     title: parsed.data.title?.trim() || null,
     startsAt: parsed.data.startsAt,
+    endsAt: parsed.data.endsAt ?? null,
     durationMinutes: parsed.data.durationMinutes,
   });
 
   revalidatePath("/seances");
   return { ok: true, sessionId: created.id };
+}
+
+const verseSchema = z.object({
+  sessionId: z.string().uuid(),
+  surah: z.string().trim().max(120).nullable(),
+  ayah: z.number().int().min(1).max(1000).nullable(),
+});
+
+export async function setSessionVerseAction(
+  input: unknown,
+): Promise<{ ok: boolean; error?: string }> {
+  const parsed = verseSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "Donnees invalides" };
+
+  const teacher = await requireTeacher();
+  try {
+    await requireSessionAccess(teacher.id, parsed.data.sessionId);
+    await updateSessionVerse(parsed.data.sessionId, {
+      surah: parsed.data.surah?.trim() || null,
+      ayah: parsed.data.ayah,
+    });
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Enregistrement impossible" };
+  }
+
+  revalidatePath(`/seances/${parsed.data.sessionId}`);
+  return { ok: true };
 }
 
 export async function setSessionStatusAction(

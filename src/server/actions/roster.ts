@@ -25,11 +25,43 @@ function fail(error: unknown): ActionResult {
   return { ok: false, error: error instanceof Error ? error.message : "Operation impossible" };
 }
 
+const nullableText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .nullish()
+    .transform((value) => {
+      const trimmed = (value ?? "").trim();
+      return trimmed.length > 0 ? trimmed : null;
+    });
+
+const optionalEmail = z
+  .string()
+  .trim()
+  .max(160)
+  .nullish()
+  .refine((value) => {
+    const trimmed = (value ?? "").trim();
+    return trimmed === "" || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed);
+  }, "E-mail invalide")
+  .transform((value) => {
+    const trimmed = (value ?? "").trim();
+    return trimmed.length > 0 ? trimmed : null;
+  });
+
+const contactFields = {
+  city: nullableText(80),
+  email: optionalEmail,
+  phone: nullableText(30),
+};
+
 const studentSchema = z.object({
   cohortId: z.string().uuid(),
   firstName: z.string().trim().min(1, "Prenom requis").max(80),
   lastName: z.string().trim().min(1, "Nom requis").max(80),
   birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  ...contactFields,
 });
 
 export async function addStudentAction(input: unknown): Promise<ActionResult> {
@@ -53,6 +85,7 @@ const updateStudentSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
   lastName: z.string().trim().min(1).max(80),
   birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  ...contactFields,
 });
 
 export async function updateStudentAction(input: unknown): Promise<ActionResult> {

@@ -1,4 +1,9 @@
-export type Attendance = "present" | "retard" | "absent" | "exempt" | "inconnu";
+export type Attendance =
+  | "present"
+  | "retard"
+  | "absent_justifie"
+  | "absent_non_justifie"
+  | "inconnu";
 export type SessionStatus = "ouverte" | "cloturee";
 export type MessageKind = "groupe" | "direct";
 export type MessageStatus = "en_attente" | "envoye" | "echec" | "ignore";
@@ -16,6 +21,10 @@ export interface Cohort {
   level: string | null;
   subject: string | null;
   slot_label: string | null;
+  weekday: number | null;
+  start_time: string | null;
+  end_time: string | null;
+  timezone: string;
   active: boolean;
 }
 
@@ -25,6 +34,9 @@ export interface Student {
   first_name: string;
   last_name: string;
   birthdate: string | null;
+  city: string | null;
+  email: string | null;
+  phone: string | null;
   active: boolean;
 }
 
@@ -46,9 +58,12 @@ export interface Session {
   teacher_id: string;
   title: string | null;
   starts_at: string;
+  ends_at: string | null;
   duration_minutes: number | null;
   status: SessionStatus;
   closed_at: string | null;
+  last_surah: string | null;
+  last_ayah: number | null;
 }
 
 export interface SessionEntry {
