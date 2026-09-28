@@ -62,12 +62,12 @@ export async function POST(request: Request) {
   await replyToChat(
     chatId,
     [
-      `Bonjour ${guardian.full_name},`,
+      `السلام عليكم ${guardian.full_name},`,
       "",
       `Votre compte Telegram est maintenant relié à ${studentName}.`,
       "Vous y recevrez les messages de l'institut : absences, validations, besoins de matériel.",
       "",
-      "À bientôt.",
+      "في أمان الله",
     ].join("\n"),
   );
 
